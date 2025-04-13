@@ -1,36 +1,25 @@
-# P2P Tracker
+# Binance P2P Tracker
 
-A real-time web application for tracking Binance P2P trading data. This application allows users to monitor buy and sell orders for various cryptocurrencies and fiat currencies, with customizable filters for payment methods.
+A web application for tracking Binance P2P trading data, including buy/sell orders and arbitrage opportunities.
 
 ## Features
 
-- Real-time P2P trading data from Binance
-- Support for multiple cryptocurrencies (USDT, USDC, BTC, ETH)
-- Support for multiple fiat currencies (USD, CAD, MYR)
+- Real-time P2P price tracking
+- Buy/Sell order comparison
+- Arbitrage opportunity detection
+- Multiple currency support (USD, CAD, MYR)
+- Multiple cryptocurrency support (USDT, USDC, BTC, ETH)
 - Payment method filtering
-- Auto-refresh every 30 seconds
-- Clean and responsive UI
-- Price display with 4 decimal precision
+- Responsive design
 
-## Technology Stack
+## Setup Instructions
 
-- Backend: Python with Flask
-- Frontend: HTML, CSS, JavaScript
-- API: Custom Binance P2P data scraper
-- Deployment: Azure Web App
-
-## Prerequisites
-
-- Python 3.8 or higher
-- pip (Python package manager)
-- Web browser with JavaScript enabled
-
-## Installation
+### Local Development
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/p2p-tracker.git
-cd p2p-tracker
+git clone https://github.com/yourusername/binance-p2p-tracker.git
+cd binance-p2p-tracker
 ```
 
 2. Create and activate a virtual environment:
@@ -38,7 +27,7 @@ cd p2p-tracker
 python -m venv venv
 # On Windows
 venv\Scripts\activate
-# On Unix or MacOS
+# On macOS/Linux
 source venv/bin/activate
 ```
 
@@ -47,57 +36,86 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## Configuration
+4. Create a `.env` file in the root directory with the following content:
+```env
+# Environment
+ENVIRONMENT=development
 
-The application can be configured using environment variables:
+# Server Configuration
+PORT=8080
+HOST=127.0.0.1
+DEBUG=True
+FLASK_ENV=development
 
-- `PORT`: The port number for the Flask server (default: 8080)
-- `API_BASE_URL`: The base URL for the P2P data API (default: https://p2p-tracker.azurewebsites.net/api/p2p-data)
+# API Configuration
+DEV_API_URL=http://127.0.0.1:8080/api/p2p-data
+PROD_API_URL=https://your-azure-app.azurewebsites.net/api/p2p-data
+API_BASE_URL=${DEV_API_URL}
 
-## Running the Application
+# Default Values
+DEFAULT_TRADE_TYPE=BUY
+DEFAULT_FIAT=USD
+DEFAULT_CRYPTO=USDT
 
-1. Start the Flask server:
+# CORS Configuration
+CORS_ORIGINS=*
+
+# Static Files
+STATIC_FOLDER=static
+TEMPLATE_FOLDER=.
+```
+
+5. Run the application:
 ```bash
 python app.py
 ```
 
-2. Open your web browser and navigate to:
-```
-http://localhost:8080
-```
+The application will be available at `http://127.0.0.1:8080`
 
-## API Endpoints
+### Azure Deployment
 
-### GET /api/p2p-data
+1. Create an Azure App Service
+2. Configure the following Application Settings in Azure Portal:
+   - Go to your App Service > Configuration > Application settings
+   - Add the following settings:
+     ```
+     ENVIRONMENT=production
+     PORT=8080
+     HOST=0.0.0.0
+     DEBUG=False
+     FLASK_ENV=production
+     API_BASE_URL=https://your-azure-app.azurewebsites.net/api/p2p-data
+     DEFAULT_TRADE_TYPE=BUY
+     DEFAULT_FIAT=USD
+     DEFAULT_CRYPTO=USDT
+     CORS_ORIGINS=*
+     STATIC_FOLDER=static
+     TEMPLATE_FOLDER=.
+     ```
 
-Fetches P2P trading data with the following query parameters:
+3. Deploy your application to Azure App Service
 
-- `tradeType`: 'BUY' or 'SELL' (default: 'BUY')
-- `fiat`: Fiat currency code (default: 'USD')
-- `crypto`: Cryptocurrency code (default: 'USDT')
-- `paymentMethod`: Payment method filter (optional)
+## Environment Variables Explanation
 
-Example:
-```
-GET /api/p2p-data?tradeType=BUY&fiat=USD&crypto=USDT&paymentMethod=Bank
-```
+- `ENVIRONMENT`: Set to 'development' for local development or 'production' for Azure
+- `PORT`: The port number the application will run on
+- `HOST`: The host address (use 127.0.0.1 for local, 0.0.0.0 for Azure)
+- `DEBUG`: Enable/disable debug mode
+- `FLASK_ENV`: Flask environment setting
+- `API_BASE_URL`: The base URL for API endpoints
+- `DEFAULT_TRADE_TYPE`: Default trade type (BUY/SELL)
+- `DEFAULT_FIAT`: Default fiat currency
+- `DEFAULT_CRYPTO`: Default cryptocurrency
+- `CORS_ORIGINS`: CORS allowed origins
+- `STATIC_FOLDER`: Folder containing static files
+- `TEMPLATE_FOLDER`: Folder containing HTML templates
 
-### GET /api/health
+## Security Note
 
-Health check endpoint that returns the server status.
-
-## Project Structure
-
-```
-p2p-tracker/
-├── app.py              # Flask application
-├── binance_scraper.py  # Binance P2P data scraper
-├── requirements.txt    # Python dependencies
-├── static/            # Static files
-│   ├── styles.css     # CSS styles
-│   └── script.js      # Frontend JavaScript
-└── index.html         # Main HTML template
-```
+Never commit your `.env` file to version control. The `.env` file is included in `.gitignore` for security reasons. Instead:
+1. Keep your local `.env` file secure
+2. Use Azure Application Settings for production deployment
+3. Share necessary configuration through `.env.example` (without sensitive values)
 
 ## Contributing
 
@@ -109,7 +127,7 @@ p2p-tracker/
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 

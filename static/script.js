@@ -1,16 +1,14 @@
 // Constants and Configuration
-const API_BASE_URL = 'http://localhost:8080/api/p2p-data';
+const API_BASE_URL = window.API_BASE_URL || 'https://p2p-tracker.azurewebsites.net/api/p2p-data';
 
 // DOM Elements
-const currencySelect = document.getElementById('currency');
-const cryptoSelect = document.getElementById('crypto');
-const paymentInput = document.getElementById('payment');
+const tradeTypeButtons = document.querySelectorAll('.trade-type-btn');
+const currencySelect = document.getElementById('currencySelect');
+const cryptoSelect = document.getElementById('cryptoSelect');
+const paymentMethodInput = document.getElementById('paymentMethodInput');
 const refreshBtn = document.getElementById('refreshBtn');
-const lastUpdatedSpan = document.getElementById('lastUpdated');
-const tabs = document.querySelectorAll('.tab');
-const buyTable = document.getElementById('buyTable');
-const sellTable = document.getElementById('sellTable');
-const arbitrageTable = document.getElementById('arbitrageTable');
+const lastUpdated = document.getElementById('lastUpdated');
+const dataTable = document.getElementById('dataTable');
 
 // State Management
 const currentFilters = {
@@ -20,144 +18,86 @@ const currentFilters = {
     paymentMethod: ''
 };
 
-let buyData = [];
-let sellData = [];
-
 // Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
-    initEventListeners();
-    fetchBothData(); // Initial data fetch for both buy and sell
+    fetchData();
+    setInterval(fetchData, 30000); // Refresh every 30 seconds
 });
 
 // Set up event listeners
 function initEventListeners() {
-    // Currency select
-    currencySelect.addEventListener('change', () => {
-        currentFilters.fiat = currencySelect.value;
-        fetchBothData();
+    tradeTypeButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            tradeTypeButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            currentFilters.tradeType = button.getAttribute('data-type');
+            fetchData();
+        });
     });
 
-    // Crypto select
-    cryptoSelect.addEventListener('change', () => {
-        currentFilters.crypto = cryptoSelect.value;
-        fetchBothData();
+    currencySelect.addEventListener('change', (e) => {
+        currentFilters.fiat = e.target.value;
+        fetchData();
     });
 
-    // Payment method input with debounce
+    cryptoSelect.addEventListener('change', (e) => {
+        currentFilters.crypto = e.target.value;
+        fetchData();
+    });
+
     let debounceTimeout;
-    paymentInput.addEventListener('input', () => {
+    paymentMethodInput.addEventListener('input', (e) => {
         clearTimeout(debounceTimeout);
         debounceTimeout = setTimeout(() => {
-            currentFilters.paymentMethod = paymentInput.value.trim();
-            fetchBothData();
+            currentFilters.paymentMethod = e.target.value;
+            fetchData();
         }, 300);
     });
 
-    // Refresh button
-    refreshBtn.addEventListener('click', fetchBothData);
-
-    // Tab switching
-    tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            // Remove active class from all tabs and contents
-            tabs.forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            
-            // Add active class to clicked tab and corresponding content
-            tab.classList.add('active');
-            const contentId = `${tab.dataset.tab}-tab`;
-            document.getElementById(contentId)?.classList.add('active');
-
-            // Always fetch new data when switching tabs
-            fetchBothData().then(() => {
-                // After fetching new data, calculate arbitrage if on arbitrage tab
-                if (tab.dataset.tab === 'arbitrage') {
-                    calculateArbitrage();
-                }
-            });
-        });
-    });
+    refreshBtn.addEventListener('click', fetchData);
 }
 
-// Fetch both buy and sell data
-async function fetchBothData() {
+// Fetch data
+async function fetchData() {
     try {
-        // Show loading state
-        const activeTable = document.querySelector('.tab-content.active table tbody');
-        if (activeTable) {
-            activeTable.innerHTML = '<tr><td colspan="5" class="no-data">Loading data...</td></tr>';
-        }
-
-        // Fetch buy data
-        const buyParams = new URLSearchParams({
-            tradeType: 'BUY',
+        const params = new URLSearchParams({
+            tradeType: currentFilters.tradeType,
             fiat: currentFilters.fiat,
-            crypto: currentFilters.crypto,
+            asset: currentFilters.crypto,
             paymentMethod: currentFilters.paymentMethod
         });
 
-        // Fetch sell data
-        const sellParams = new URLSearchParams({
-            tradeType: 'SELL',
-            fiat: currentFilters.fiat,
-            crypto: currentFilters.crypto,
-            paymentMethod: currentFilters.paymentMethod
-        });
+        const response = await fetch(`${API_BASE_URL}?${params}`);
+        if (!response.ok) throw new Error('Network response was not ok');
+        
+        const data = await response.json();
+        if (!data || !Array.isArray(data)) throw new Error('Invalid data format');
 
-        const [buyResponse, sellResponse] = await Promise.all([
-            fetch(`${API_BASE_URL}?${buyParams}`),
-            fetch(`${API_BASE_URL}?${sellParams}`)
-        ]);
-
-        if (!buyResponse.ok || !sellResponse.ok) {
-            throw new Error('Failed to fetch data');
-        }
-
-        buyData = await buyResponse.json();
-        sellData = await sellResponse.json();
-
-        // Update tables
-        updateTable(buyTable, buyData);
-        updateTable(sellTable, sellData);
-
-        // If we're on the arbitrage tab, recalculate opportunities
-        if (document.querySelector('.tab[data-tab="arbitrage"]').classList.contains('active')) {
-            calculateArbitrage();
-        }
-
-        updateLastUpdated();
+        updateTable(data);
+        lastUpdated.textContent = new Date().toLocaleTimeString();
     } catch (error) {
         console.error('Error fetching data:', error);
-        showError('Failed to fetch data. Please try again.');
+        dataTable.innerHTML = '<tr><td colspan="4">Error loading data. Please try again.</td></tr>';
     }
 }
 
 // Update table with fetched data
-function updateTable(table, data) {
-    if (!table) return;
-    
-    const tbody = table.querySelector('tbody');
-    if (!tbody) return;
-
-    if (!data || data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5" class="no-data">No data available</td></tr>';
+function updateTable(data) {
+    if (!data.length) {
+        dataTable.innerHTML = '<tr><td colspan="4">No data available</td></tr>';
         return;
     }
 
-    tbody.innerHTML = '';
-    data.forEach(item => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${item.advertiser || '-'}</td>
-            <td>${formatPrice(item.price)}</td>
-            <td>${formatPrice(item.available)}</td>
-            <td>${formatPrice(item.minLimit)} - ${formatPrice(item.maxLimit)}</td>
-            <td>${Array.isArray(item.paymentMethods) ? item.paymentMethods.join(', ') : '-'}</td>
-        `;
-        tbody.appendChild(row);
-    });
+    const tableContent = data.map(item => `
+        <tr>
+            <td>${item.merchant_name || 'N/A'}</td>
+            <td>${item.price.toFixed(4)}</td>
+            <td>${item.available_amount || 'N/A'}</td>
+            <td>${item.payment_method || 'N/A'}</td>
+        </tr>
+    `).join('');
+
+    dataTable.innerHTML = tableContent;
 }
 
 // Calculate and display arbitrage opportunities
@@ -232,14 +172,6 @@ function formatPrice(value) {
         return '0.0000';
     }
     return value.toFixed(4);
-}
-
-// Update last updated timestamp
-function updateLastUpdated() {
-    if (lastUpdatedSpan) {
-        const now = new Date();
-        lastUpdatedSpan.textContent = now.toLocaleTimeString();
-    }
 }
 
 // Show error message

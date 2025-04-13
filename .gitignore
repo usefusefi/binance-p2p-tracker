@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 *.so
 .Python
+env/
 build/
 develop-eggs/
 dist/
@@ -23,7 +24,6 @@ wheels/
 # Virtual Environment
 venv/
 ENV/
-env/
 .env
 
 # IDE
@@ -35,4 +35,11 @@ env/
 
 # Logs
 *.log
-logs/ 
+logs/
+log/
+
+# Local development
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local 

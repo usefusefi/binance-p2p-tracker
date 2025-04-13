@@ -67,7 +67,8 @@ wsgi_app = app.wsgi_app
 
 if __name__ == '__main__':
     try:
-        host = '127.0.0.1'  # Always bind to 127.0.0.1 for local development
+        # Use 0.0.0.0 for Azure to allow external connections
+        host = '0.0.0.0' if ENVIRONMENT == 'production' else '127.0.0.1'
         port = int(os.environ.get('PORT', 8080))
         print(f"Starting server on {host}:{port} with debug={DEBUG}")
         app.run(host=host, port=port, debug=DEBUG)

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binance P2P Data</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Binance P2P Data</h1>
+            <div class="header-actions">
+                <span>Last updated: <span id="lastUpdated">Never</span></span>
+                <button id="refreshBtn">Refresh</button>
+            </div>
+        </div>
+
+        <div class="filters">
+            <select id="currency">
+                <option value="USD">USD</option>
+                <option value="CAD">CAD</option>
+                <option value="MYR">MYR</option>
+            </select>
+            <select id="crypto">
+                <option value="USDT">USDT</option>
+                <option value="USDC">USDC</option>
+                <option value="BTC">BTC</option>
+                <option value="ETH">ETH</option>
+            </select>
+            <input type="text" id="payment" placeholder="Payment method...">
+        </div>
+
+        <div class="tabs-container">
+            <div class="tab active" data-tab="buy">
+                <i class="tab-icon">📥</i>
+                <span>Buy Orders</span>
+            </div>
+            <div class="tab" data-tab="sell">
+                <i class="tab-icon">📤</i>
+                <span>Sell Orders</span>
+            </div>
+            <div class="tab" data-tab="arbitrage">
+                <i class="tab-icon">💱</i>
+                <span>Arbitrage</span>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <div id="buy-tab" class="tab-content active">
+                <table id="buyTable">
+                    <thead>
+                        <tr>
+                            <th>Advertiser</th>
+                            <th>Price</th>
+                            <th>Available</th>
+                            <th>Limits</th>
+                            <th>Payment Methods</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div id="sell-tab" class="tab-content">
+                <table id="sellTable">
+                    <thead>
+                        <tr>
+                            <th>Advertiser</th>
+                            <th>Price</th>
+                            <th>Available</th>
+                            <th>Limits</th>
+                            <th>Payment Methods</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div id="arbitrage-tab" class="tab-content">
+                <table id="arbitrageTable">
+                    <thead>
+                        <tr>
+                            <th>Buy From</th>
+                            <th>Buy Price</th>
+                            <th>Sell To</th>
+                            <th>Sell Price</th>
+                            <th>Profit %</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="/static/script.js"></script>
+</body>
+</html>

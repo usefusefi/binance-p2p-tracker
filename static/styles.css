@@ -1,0 +1,314 @@
+/* Global Styles */
+:root {
+    --primary-color: #F0B90B;
+    --secondary-color: #1e2026;
+    --text-color: #333;
+    --light-bg: #f8f9fa;
+    --border-color: #e0e0e0;
+    --success-color: #02c076;
+    --danger-color: #f6465d;
+    --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f5f5f5;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+}
+
+/* Header Styles */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.header h1 {
+    margin: 0;
+    color: #333;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Filters Styles */
+.filters {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    align-items: center;
+    padding: 15px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+select, input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    min-width: 120px;
+    background-color: white;
+}
+
+select {
+    cursor: pointer;
+}
+
+select:hover {
+    border-color: #007bff;
+}
+
+input {
+    min-width: 200px;
+}
+
+input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+}
+
+/* Tabs Styles */
+.tabs-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #eee;
+}
+
+.tab {
+    padding: 12px 24px;
+    cursor: pointer;
+    border-radius: 8px 8px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background-color: #f8f9fa;
+    border: 1px solid #eee;
+    border-bottom: none;
+    transition: all 0.3s ease;
+}
+
+.tab:hover {
+    background-color: #e9ecef;
+}
+
+.tab.active {
+    background-color: white;
+    border-bottom: 2px solid #007bff;
+    margin-bottom: -2px;
+}
+
+.tab-icon {
+    font-size: 1.2em;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Table Styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+th {
+    background-color: #f8f9fa;
+    font-weight: bold;
+    color: #333;
+}
+
+tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Button Styles */
+button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#refreshBtn {
+    background-color: #28a745;
+    color: white;
+}
+
+#refreshBtn:hover {
+    background-color: #218838;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    .filters {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    select, input {
+        width: 100%;
+    }
+    
+    .tab {
+        padding: 8px 16px;
+    }
+    
+    .header {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+}
+
+/* Table content styles */
+.no-data {
+    text-align: center;
+    color: #666;
+    padding: 20px;
+    font-style: italic;
+}
+
+/* Price formatting */
+.price {
+    font-family: monospace;
+    font-size: 1.1em;
+}
+
+.profit-positive {
+    color: #28a745;
+    font-weight: bold;
+}
+
+.profit-negative {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+/* Payment Method Tags */
+.payment-tag {
+    display: inline-block;
+    background-color: #f0f0f0;
+    padding: 2px 8px;
+    border-radius: 12px;
+    margin: 2px;
+    font-size: 0.9em;
+    color: #333;
+}
+
+.payment-tag.highlight {
+    background-color: #e6f7ff;
+    border: 1px solid #1890ff;
+    color: #1890ff;
+    font-weight: 500;
+}
+
+/* Buy/Sell Indicators */
+.price-buy {
+    color: var(--success-color);
+    font-weight: bold;
+}
+
+.price-sell {
+    color: var(--danger-color);
+    font-weight: bold;
+}
+
+/* Arbitrage Section Styles */
+.arbitrage-section {
+    margin-top: 2rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.arbitrage-section h2 {
+    color: #2c3e50;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.arbitrage-filters {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    align-items: center;
+}
+
+.arbitrage-filters label {
+    font-weight: 500;
+    color: #2c3e50;
+}
+
+.arbitrage-filters input {
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    width: 100px;
+}
+
+#arbitrage-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+#arbitrage-table th {
+    background-color: #2c3e50;
+    color: white;
+    padding: 0.75rem;
+    text-align: left;
+}
+
+#arbitrage-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #ddd;
+}
+
+#arbitrage-table tr:hover {
+    background-color: #f0f0f0;
+}
+
+.available-amount {
+    color: #3498db;
+    font-weight: 500;
+}

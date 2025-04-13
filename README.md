@@ -1,24 +1,27 @@
 # Binance P2P Tracker
 
-A web application for tracking Binance P2P trading data, including buy/sell orders and arbitrage opportunities.
+A web application that tracks and displays Binance P2P trading data, allowing users to monitor buy/sell prices and find arbitrage opportunities.
 
 ## Features
 
-- Real-time P2P price tracking
-- Buy/Sell order comparison
+- Real-time P2P price tracking for Binance
+- Support for multiple fiat currencies and cryptocurrencies
+- Filter by payment methods
+- Clean and responsive UI
+- Auto-refresh functionality
 - Arbitrage opportunity detection
-- Multiple currency support (USD, CAD, MYR)
-- Multiple cryptocurrency support (USDT, USDC, BTC, ETH)
-- Payment method filtering
-- Responsive design
 
-## Setup Instructions
+## Prerequisites
 
-### Local Development
+- Python 3.6 or higher
+- pip (Python package manager)
+- Git
+
+## Installation
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/binance-p2p-tracker.git
+git clone https://github.com/usefusefi/binance-p2p-tracker.git
 cd binance-p2p-tracker
 ```
 
@@ -27,7 +30,7 @@ cd binance-p2p-tracker
 python -m venv venv
 # On Windows
 venv\Scripts\activate
-# On macOS/Linux
+# On Unix or MacOS
 source venv/bin/activate
 ```
 
@@ -36,94 +39,72 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-4. Create a `.env` file in the root directory with the following content:
-```env
-# Environment
+4. Create a `.env` file in the root directory with the following variables:
+```
 ENVIRONMENT=development
-
-# Server Configuration
-PORT=8080
-HOST=127.0.0.1
 DEBUG=True
-FLASK_ENV=development
-
-# API Configuration
-DEV_API_URL=http://127.0.0.1:8080/api/p2p-data
-PROD_API_URL=https://your-azure-app.azurewebsites.net/api/p2p-data
-API_BASE_URL=${DEV_API_URL}
-
-# Default Values
+STATIC_FOLDER=static
+TEMPLATE_FOLDER=.
+CORS_ORIGINS=*
 DEFAULT_TRADE_TYPE=BUY
 DEFAULT_FIAT=USD
 DEFAULT_CRYPTO=USDT
-
-# CORS Configuration
-CORS_ORIGINS=*
-
-# Static Files
-STATIC_FOLDER=static
-TEMPLATE_FOLDER=.
 ```
 
-5. Run the application:
+## Running the Application
+
+1. Start the Flask development server:
 ```bash
 python app.py
 ```
 
-The application will be available at `http://127.0.0.1:8080`
+2. Open your browser and navigate to:
+```
+http://127.0.0.1:8080
+```
 
-### Azure Deployment
+## Deployment
 
-1. Create an Azure App Service
-2. Configure the following Application Settings in Azure Portal:
-   - Go to your App Service > Configuration > Application settings
-   - Add the following settings:
-     ```
-     ENVIRONMENT=production
-     PORT=8080
-     HOST=0.0.0.0
-     DEBUG=False
-     FLASK_ENV=production
-     API_BASE_URL=https://your-azure-app.azurewebsites.net/api/p2p-data
-     DEFAULT_TRADE_TYPE=BUY
-     DEFAULT_FIAT=USD
-     DEFAULT_CRYPTO=USDT
-     CORS_ORIGINS=*
-     STATIC_FOLDER=static
-     TEMPLATE_FOLDER=.
-     ```
+The application is configured for deployment on Azure App Service. The deployment is automated through GitHub Actions.
 
-3. Deploy your application to Azure App Service
+### Azure Configuration
 
-## Environment Variables Explanation
+- The application runs on port 8080
+- Uses Gunicorn as the WSGI server
+- Static files are served from the `static` directory
+- Environment variables are managed through Azure App Service configuration
 
-- `ENVIRONMENT`: Set to 'development' for local development or 'production' for Azure
-- `PORT`: The port number the application will run on
-- `HOST`: The host address (use 127.0.0.1 for local, 0.0.0.0 for Azure)
-- `DEBUG`: Enable/disable debug mode
-- `FLASK_ENV`: Flask environment setting
-- `API_BASE_URL`: The base URL for API endpoints
-- `DEFAULT_TRADE_TYPE`: Default trade type (BUY/SELL)
-- `DEFAULT_FIAT`: Default fiat currency
-- `DEFAULT_CRYPTO`: Default cryptocurrency
-- `CORS_ORIGINS`: CORS allowed origins
-- `STATIC_FOLDER`: Folder containing static files
-- `TEMPLATE_FOLDER`: Folder containing HTML templates
+## Project Structure
+
+```
+binance-p2p-tracker/
+├── app.py              # Main Flask application
+├── binance_scraper.py  # Binance P2P data scraper
+├── static/             # Static files (CSS, JS)
+│   ├── styles.css
+│   └── script.js
+├── index.html          # Main HTML template
+├── requirements.txt    # Python dependencies
+├── web.config          # Azure configuration
+└── startup.sh          # Azure startup script for Gunicorn
+```
+
+The `startup.sh` script is used by Azure App Service to start the Gunicorn server with the correct configuration for production deployment.
 
 ## Contributing
 
 1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Acknowledgments
 
-- Binance P2P Trading Platform
-- Flask Framework
-- Azure Web Services
+- Binance API for providing P2P trading data
+- Flask for the web framework
+- Azure for hosting infrastructure

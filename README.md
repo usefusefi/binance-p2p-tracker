@@ -110,13 +110,6 @@ The application will be available at `http://127.0.0.1:8080`
 - `STATIC_FOLDER`: Folder containing static files
 - `TEMPLATE_FOLDER`: Folder containing HTML templates
 
-## Security Note
-
-Never commit your `.env` file to version control. The `.env` file is included in `.gitignore` for security reasons. Instead:
-1. Keep your local `.env` file secure
-2. Use Azure Application Settings for production deployment
-3. Share necessary configuration through `.env.example` (without sensitive values)
-
 ## Contributing
 
 1. Fork the repository

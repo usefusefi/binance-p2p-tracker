@@ -27,18 +27,17 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     background-color: white;
+    padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 20px;
 }
 
-/* Header Styles */
 .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-    padding-bottom: 20px;
+    padding-bottom: 10px;
     border-bottom: 1px solid #eee;
 }
 
@@ -51,6 +50,93 @@ body {
     display: flex;
     align-items: center;
     gap: 15px;
+}
+
+#refreshBtn {
+    padding: 8px 16px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#refreshBtn:hover {
+    background-color: #45a049;
+}
+
+.filters {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.filters select,
+.filters input {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.filters input {
+    flex-grow: 1;
+}
+
+.trade-type-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.trade-type-btn {
+    padding: 10px 20px;
+    border: 1px solid #ddd;
+    background-color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.trade-type-btn.active {
+    background-color: #4CAF50;
+    color: white;
+    border-color: #4CAF50;
+}
+
+.content-section {
+    background-color: white;
+    border-radius: 4px;
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f8f8f8;
+    font-weight: bold;
+    color: #333;
+}
+
+tr:hover {
+    background-color: #f5f5f5;
+}
+
+.no-data {
+    text-align: center;
+    color: #666;
+    padding: 20px;
 }
 
 /* Filters Styles */
@@ -166,15 +252,6 @@ button {
     transition: all 0.3s ease;
 }
 
-#refreshBtn {
-    background-color: #28a745;
-    color: white;
-}
-
-#refreshBtn:hover {
-    background-color: #218838;
-}
-
 /* Responsive Styles */
 @media (max-width: 768px) {
     .filters {
@@ -195,14 +272,6 @@ button {
         gap: 10px;
         text-align: center;
     }
-}
-
-/* Table content styles */
-.no-data {
-    text-align: center;
-    color: #666;
-    padding: 20px;
-    font-style: italic;
 }
 
 /* Price formatting */

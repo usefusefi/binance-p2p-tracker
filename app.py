@@ -13,7 +13,7 @@ if ENVIRONMENT == 'production':
     API_BASE_URL = os.environ.get('PROD_API_URL', 'https://p2p-tracker.azurewebsites.net/api/p2p-data')
     DEBUG = False
 else:
-    API_BASE_URL = os.environ.get('DEV_API_URL', 'http://localhost:8080/api/p2p-data')
+    API_BASE_URL = os.environ.get('DEV_API_URL', 'http://127.0.0.1:8080/api/p2p-data')
     DEBUG = os.environ.get('DEBUG', 'True').lower() == 'true'
 
 # Get configuration from environment variables
@@ -31,6 +31,7 @@ scraper = BinanceScraper()
 
 @app.route('/')
 def index():
+    print(f"Serving index.html with API_URL: {API_BASE_URL}")
     return render_template('index.html', api_url=API_BASE_URL)
 
 @app.route('/api/p2p-data', methods=['GET'])
@@ -66,8 +67,9 @@ wsgi_app = app.wsgi_app
 
 if __name__ == '__main__':
     try:
-        host = os.environ.get('HOST', '0.0.0.0')
+        host = '127.0.0.1'  # Always bind to 127.0.0.1 for local development
         port = int(os.environ.get('PORT', 8080))
+        print(f"Starting server on {host}:{port} with debug={DEBUG}")
         app.run(host=host, port=port, debug=DEBUG)
     except Exception as e:
         print(f"Error starting the server: {e}")

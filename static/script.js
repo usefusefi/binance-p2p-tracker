@@ -1,16 +1,7 @@
 // Constants and Configuration
-const API_BASE_URL = window.API_BASE_URL || 'https://p2p-tracker.azurewebsites.net/api/p2p-data';
+const API_BASE_URL = window.API_BASE_URL || 'http://127.0.0.1:8080/api/p2p-data';
 
-// DOM Elements
-const tradeTypeButtons = document.querySelectorAll('.trade-type-btn');
-const currencySelect = document.getElementById('currencySelect');
-const cryptoSelect = document.getElementById('cryptoSelect');
-const paymentMethodInput = document.getElementById('paymentMethodInput');
-const refreshBtn = document.getElementById('refreshBtn');
-const lastUpdated = document.getElementById('lastUpdated');
-const dataTable = document.getElementById('dataTable');
-
-// State Management
+// Constants and state
 const currentFilters = {
     tradeType: 'BUY',
     fiat: 'USD',
@@ -18,86 +9,181 @@ const currentFilters = {
     paymentMethod: ''
 };
 
+let buyData = [];
+let sellData = [];
+
+// DOM Elements
+const currencySelect = document.getElementById('currency');
+const cryptoSelect = document.getElementById('crypto');
+const paymentInput = document.getElementById('payment');
+const refreshBtn = document.getElementById('refreshBtn');
+const lastUpdatedSpan = document.getElementById('lastUpdated');
+const tabs = document.querySelectorAll('.tab');
+const buyTable = document.getElementById('buyTable');
+const sellTable = document.getElementById('sellTable');
+const arbitrageTable = document.getElementById('arbitrageTable');
+
 // Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
-    fetchData();
-    setInterval(fetchData, 30000); // Refresh every 30 seconds
+    console.log('DOM Content Loaded');
+    console.log('API_BASE_URL:', API_BASE_URL);
+    initEventListeners();
+    fetchBothData(); // Initial data fetch
 });
 
 // Set up event listeners
 function initEventListeners() {
-    tradeTypeButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            tradeTypeButtons.forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-            currentFilters.tradeType = button.getAttribute('data-type');
-            fetchData();
-        });
+    console.log('Setting up event listeners');
+    
+    // Currency select
+    currencySelect.addEventListener('change', () => {
+        console.log('Currency changed:', currencySelect.value);
+        currentFilters.fiat = currencySelect.value;
+        fetchBothData();
     });
 
-    currencySelect.addEventListener('change', (e) => {
-        currentFilters.fiat = e.target.value;
-        fetchData();
+    // Crypto select
+    cryptoSelect.addEventListener('change', () => {
+        console.log('Crypto changed:', cryptoSelect.value);
+        currentFilters.crypto = cryptoSelect.value;
+        fetchBothData();
     });
 
-    cryptoSelect.addEventListener('change', (e) => {
-        currentFilters.crypto = e.target.value;
-        fetchData();
-    });
-
+    // Payment method input with debounce
     let debounceTimeout;
-    paymentMethodInput.addEventListener('input', (e) => {
+    paymentInput.addEventListener('input', () => {
         clearTimeout(debounceTimeout);
         debounceTimeout = setTimeout(() => {
-            currentFilters.paymentMethod = e.target.value;
-            fetchData();
+            console.log('Payment method changed:', paymentInput.value);
+            currentFilters.paymentMethod = paymentInput.value.trim();
+            fetchBothData();
         }, 300);
     });
 
-    refreshBtn.addEventListener('click', fetchData);
+    // Refresh button
+    refreshBtn.addEventListener('click', () => {
+        console.log('Refresh clicked');
+        fetchBothData();
+    });
+
+    // Tab switching
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            console.log('Tab clicked:', tab.dataset.tab);
+            // Remove active class from all tabs and contents
+            tabs.forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Add active class to clicked tab and corresponding content
+            tab.classList.add('active');
+            const contentId = `${tab.dataset.tab}-tab`;
+            document.getElementById(contentId)?.classList.add('active');
+
+            // Update currentFilters with the selected trade type
+            currentFilters.tradeType = tab.dataset.tab.toUpperCase();
+            console.log('Updated currentFilters:', currentFilters);
+
+            // Always fetch new data when switching tabs
+            fetchBothData().then(() => {
+                // After fetching new data, calculate arbitrage if on arbitrage tab
+                if (tab.dataset.tab === 'arbitrage') {
+                    calculateArbitrage();
+                }
+            });
+        });
+    });
 }
 
-// Fetch data
-async function fetchData() {
+// Fetch both buy and sell data
+async function fetchBothData() {
     try {
-        const params = new URLSearchParams({
-            tradeType: currentFilters.tradeType,
+        console.log('Fetching data with filters:', currentFilters);
+        
+        // Show loading state
+        const activeTable = document.querySelector('.tab-content.active table tbody');
+        if (activeTable) {
+            activeTable.innerHTML = '<tr><td colspan="5" class="no-data">Loading data...</td></tr>';
+        }
+
+        // Fetch buy data
+        const buyParams = new URLSearchParams({
+            tradeType: 'BUY',
             fiat: currentFilters.fiat,
-            asset: currentFilters.crypto,
+            crypto: currentFilters.crypto,
             paymentMethod: currentFilters.paymentMethod
         });
 
-        const response = await fetch(`${API_BASE_URL}?${params}`);
-        if (!response.ok) throw new Error('Network response was not ok');
-        
-        const data = await response.json();
-        if (!data || !Array.isArray(data)) throw new Error('Invalid data format');
+        // Fetch sell data
+        const sellParams = new URLSearchParams({
+            tradeType: 'SELL',
+            fiat: currentFilters.fiat,
+            crypto: currentFilters.crypto,
+            paymentMethod: currentFilters.paymentMethod
+        });
 
-        updateTable(data);
-        lastUpdated.textContent = new Date().toLocaleTimeString();
+        console.log('Buy URL:', `${API_BASE_URL}?${buyParams}`);
+        console.log('Sell URL:', `${API_BASE_URL}?${sellParams}`);
+
+        const [buyResponse, sellResponse] = await Promise.all([
+            fetch(`${API_BASE_URL}?${buyParams}`),
+            fetch(`${API_BASE_URL}?${sellParams}`)
+        ]);
+
+        console.log('Buy response status:', buyResponse.status);
+        console.log('Sell response status:', sellResponse.status);
+
+        if (!buyResponse.ok || !sellResponse.ok) {
+            throw new Error('Failed to fetch data');
+        }
+
+        buyData = await buyResponse.json();
+        sellData = await sellResponse.json();
+
+        console.log('Buy data:', buyData);
+        console.log('Sell data:', sellData);
+
+        // Update tables
+        updateTable(buyTable, buyData);
+        updateTable(sellTable, sellData);
+
+        // If we're on the arbitrage tab, recalculate opportunities
+        if (document.querySelector('.tab[data-tab="arbitrage"]').classList.contains('active')) {
+            calculateArbitrage();
+        }
+
+        updateLastUpdated();
     } catch (error) {
         console.error('Error fetching data:', error);
-        dataTable.innerHTML = '<tr><td colspan="4">Error loading data. Please try again.</td></tr>';
+        showError('Failed to fetch data. Please try again.');
     }
 }
 
 // Update table with fetched data
-function updateTable(data) {
-    if (!data.length) {
-        dataTable.innerHTML = '<tr><td colspan="4">No data available</td></tr>';
+function updateTable(table, data) {
+    if (!table) return;
+    
+    const tbody = table.querySelector('tbody');
+    if (!tbody) return;
+
+    if (!data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="no-data">No data available</td></tr>';
         return;
     }
 
-    const tableContent = data.map(item => `
-        <tr>
-            <td>${item.merchant_name || 'N/A'}</td>
-            <td>${item.price.toFixed(4)}</td>
-            <td>${item.available_amount || 'N/A'}</td>
-            <td>${item.payment_method || 'N/A'}</td>
-        </tr>
-    `).join('');
-
-    dataTable.innerHTML = tableContent;
+    tbody.innerHTML = '';
+    data.forEach(item => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${item.advertiser || '-'}</td>
+            <td>${formatPrice(item.price)}</td>
+            <td>${formatPrice(item.available)}</td>
+            <td>${formatPrice(item.minLimit)} - ${formatPrice(item.maxLimit)}</td>
+            <td>${Array.isArray(item.paymentMethods) ? item.paymentMethods.join(', ') : '-'}</td>
+        `;
+        tbody.appendChild(row);
+    });
 }
 
 // Calculate and display arbitrage opportunities
@@ -172,6 +258,14 @@ function formatPrice(value) {
         return '0.0000';
     }
     return value.toFixed(4);
+}
+
+// Update last updated timestamp
+function updateLastUpdated() {
+    if (lastUpdatedSpan) {
+        const now = new Date();
+        lastUpdatedSpan.textContent = now.toLocaleTimeString();
+    }
 }
 
 // Show error message

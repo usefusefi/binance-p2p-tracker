@@ -1,5 +1,5 @@
 // Constants and Configuration
-const API_BASE_URL = window.API_BASE_URL || 'http://127.0.0.1:8080/api/p2p-data';
+let API_BASE_URL = window.API_BASE_URL || 'http://127.0.0.1:8080/api/p2p-data';
 
 // Constants and state
 const currentFilters = {

@@ -1,5 +1,5 @@
 // Constants and Configuration
-let API_BASE_URL = window.API_BASE_URL || 'http://127.0.0.1:8080/api/p2p-data';
+const API_BASE_URL = window.API_BASE_URL || 'http://127.0.0.1:8080/api/p2p-data';
 
 // Constants and state
 const currentFilters = {
@@ -27,6 +27,11 @@ const arbitrageTable = document.getElementById('arbitrageTable');
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM Content Loaded');
     console.log('API_BASE_URL:', API_BASE_URL);
+    if (!API_BASE_URL) {
+        console.error('API_BASE_URL is not set!');
+        showError('Configuration error: API URL not set');
+        return;
+    }
     initEventListeners();
     fetchBothData(); // Initial data fetch
 });

@@ -2,6 +2,8 @@
 
 A web application that tracks and displays Binance P2P trading data, allowing users to monitor buy/sell prices and find arbitrage opportunities.
 
+![image](https://github.com/user-attachments/assets/e762c0fe-447e-4f92-930a-4872f6a7cccc)
+
 ## Features
 
 - Real-time P2P price tracking for Binance
